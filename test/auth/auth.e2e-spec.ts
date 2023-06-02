@@ -4,12 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { AuthService } from '../../src/domain/auth/auth.service';
 import { AuthRepository } from '../../src/domain/auth/auth.repository';
-import {
-  Connection,
-  createConnection,
-  getConnectionOptions,
-  Repository,
-} from 'typeorm';
+import { Connection, createConnection, getConnectionOptions, Repository } from 'typeorm';
 import { User } from '../../src/entities/user.entity';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Post } from '../../src/entities/post.entity';
@@ -20,28 +15,31 @@ import { AuthModule } from '../../src/domain/auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication;
+    let app: INestApplication;
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        AuthModule,
-        TypeOrmModule.forRoot({
-          type: 'sqlite',
-          database: ':memory:',
-          entities: [User, Post, Comment, PostLike],
-          synchronize: true,
-          dropSchema: true,
-        }),
-      ],
-    }).compile();
+    beforeEach(async () => {
+        const moduleFixture: TestingModule = await Test.createTestingModule({
+            imports: [
+                ConfigModule.forRoot(),
+                AuthModule,
+                TypeOrmModule.forRoot({
+                    type: 'sqlite',
+                    database: ':memory:',
+                    entities: [User, Post, Comment, PostLike],
+                    synchronize: true,
+                    dropSchema: true,
+                }),
+            ],
+        }).compile();
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
-  });
+        app = moduleFixture.createNestApplication();
+        await app.init();
+    });
 
-  it('/auth/signup (POST)', () => {
-    return request(app.getHttpServer()).post('/auth/signup').expect(201);
-  });
+    it('/auth/signup (POST)', () => {
+        return request(app.getHttpServer())
+            .post('/auth/signup')
+            .send({ email: 'test@email.com2', password: '1234', nickname: 'testUser' })
+            .expect(201);
+    });
 });
