@@ -39,7 +39,14 @@ describe('AppController (e2e)', () => {
     it('/auth/signup (POST)', () => {
         return request(app.getHttpServer())
             .post('/auth/signup')
-            .send({ email: 'test@email.com2', password: '1234', nickname: 'testUser' })
+            .send({ email: 'test@email.com', password: '1234', nickname: 'testUser' })
+            .expect(201);
+    });
+
+    it('/auth/login (POST)', () => {
+        return request(app.getHttpServer())
+            .post('/auth/login')
+            .send({ email: 'test@email.com', password: '1234' })
             .expect(201);
     });
 });
