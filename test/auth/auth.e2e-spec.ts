@@ -23,12 +23,21 @@ describe('AppController (e2e)', () => {
                 ConfigModule.forRoot(),
                 AuthModule,
                 TypeOrmModule.forRoot({
-                    type: 'sqlite',
-                    database: ':memory:',
+                    type: 'mysql',
+                    host: process.env.DB_HOST,
+                    port: 3306,
+                    username: process.env.DB_USERNAME,
+                    password: process.env.DB_PASSWORD,
+                    database: process.env.DB_MOCK_DATABASE,
                     entities: [User, Post, Comment, PostLike],
-                    synchronize: true,
-                    dropSchema: true,
                 }),
+                // TypeOrmModule.forRoot({
+                //     type: 'sqlite',
+                //     database: ':memory:',
+                //     entities: [User, Post, Comment, PostLike],
+                //     synchronize: true,
+                //     dropSchema: true,
+                // }),
             ],
         }).compile();
 
@@ -39,7 +48,14 @@ describe('AppController (e2e)', () => {
     it('/auth/signup (POST)', () => {
         return request(app.getHttpServer())
             .post('/auth/signup')
-            .send({ email: 'test@email.com2', password: '1234', nickname: 'testUser' })
+            .send({ email: 'test@email.com', password: '1234', nickname: 'testUser' })
+            .expect(201);
+    });
+
+    it('/auth/login (POST)', () => {
+        return request(app.getHttpServer())
+            .post('/auth/login')
+            .send({ email: 'test@email.com', password: '1234' })
             .expect(201);
     });
 });

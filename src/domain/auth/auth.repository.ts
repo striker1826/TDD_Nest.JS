@@ -9,11 +9,7 @@ export class AuthRepository {
     constructor(@InjectRepository(User) private userModel: Repository<User>) {}
 
     async findUserByEmail(email: string): Promise<FindUserByEmailOutputDto> {
-        return await this.userModel
-            .createQueryBuilder('user')
-            .where('user.email = :email', { email })
-            .select('user.email')
-            .getOne();
+        return await this.userModel.createQueryBuilder('user').where('user.email = :email', { email }).getOne();
     }
 
     async createUser(email: string, hashedPassword: string, nickname: string): Promise<void> {
