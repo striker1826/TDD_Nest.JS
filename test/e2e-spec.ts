@@ -12,11 +12,12 @@ import { PostModule } from '../src/domain/post/post.module';
 import * as jwt from 'jsonwebtoken';
 import { JwtStrategy } from '../src/domain/auth/passport/jwt.passport';
 
+let accessToken;
 const member = { id: 1, email: 'test@email.com', password: '1234' };
 
 describe('AppController (e2e)', () => {
     let app: INestApplication;
-
+    accessToken = jwt.sign({ UserId: member.id }, 'accessKey', { expiresIn: '1800s' });
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [
@@ -49,10 +50,6 @@ describe('AppController (e2e)', () => {
         await app.init();
     });
 
-    // afterAll(async () => {
-    //     await app.close();
-    // });
-
     it('/auth/signup (POST)', () => {
         return request(app.getHttpServer())
             .post('/auth/signup')
@@ -68,7 +65,6 @@ describe('AppController (e2e)', () => {
     });
 
     it('/post (POST)', () => {
-        const accessToken = jwt.sign({ UserId: member.id }, 'accessKey', { expiresIn: '1800s' });
         return request(app.getHttpServer())
             .post('/post')
             .send({ title: '제목', content: '내용', category: 1 })
@@ -82,5 +78,13 @@ describe('AppController (e2e)', () => {
 
     it('/post:postId (GET)', () => {
         return request(app.getHttpServer()).get('/post/1').expect(200);
+    });
+
+    it('/post/:postId (PUT)', () => {
+        return request(app.getHttpServer())
+            .put('/post/1')
+            .send({ title: '제목', content: '수정된 내용', category: 1 })
+            .set('Authorization', `Bearer ${accessToken}`)
+            .expect(200);
     });
 });

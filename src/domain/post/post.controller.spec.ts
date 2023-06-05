@@ -88,4 +88,16 @@ describe('PostController', () => {
             expect(result).toEqual(mockData.post);
         });
     });
+
+    describe('updatePost', () => {
+        let postId = 1;
+        let UserId = 1;
+        const body = { title: '제목', content: '게시글 내용', category: 1 };
+
+        it('postService의 updatePost를 호출하는지 확인', async () => {
+            jest.spyOn(postService, 'updatePost').mockResolvedValue(null);
+            await postController.updatePost(postId, UserId, body);
+            expect(postService.updatePost).toHaveBeenCalledTimes(1);
+        });
+    });
 });

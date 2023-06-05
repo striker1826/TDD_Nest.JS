@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { HttpUser } from '../../common/decorators/http_user.decorator';
 import { PostService } from './post.service';
@@ -7,8 +7,8 @@ import { PostService } from './post.service';
 export class PostController {
     constructor(private postService: PostService) {}
 
-    @UseGuards(AuthGuard('jwt'))
     @Post()
+    @UseGuards(AuthGuard('jwt'))
     async createPost(@HttpUser() httpUser, @Body() body) {
         const UserId = httpUser.UserId;
         return await this.postService.createPost(UserId, body);
@@ -22,5 +22,13 @@ export class PostController {
     @Get('/:postId')
     async getOnePost(@Param('postId') postId: number) {
         return await this.postService.findOnePost(postId);
+    }
+
+    @Put('/:postId')
+    @UseGuards(AuthGuard('jwt'))
+    async updatePost(@Param('postId') postId: number, @HttpUser() httpUser, @Body() body) {
+        const UserId = httpUser.UserId;
+        await this.postService.updatePost(postId, UserId, body);
+        return;
     }
 }

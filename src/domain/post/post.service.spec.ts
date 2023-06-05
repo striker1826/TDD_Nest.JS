@@ -6,6 +6,7 @@ import { PostService } from './post.service';
 import { PostLike } from '../../entities/post-like.entity';
 import { Comment } from '../../entities/comment.entity';
 import { PostRepository } from './post.repository';
+import { BadRequestException } from '@nestjs/common';
 
 const mockData = {
     posts: [
@@ -82,6 +83,44 @@ describe('PostService', () => {
             jest.spyOn(postRepository, 'findOnePost').mockResolvedValue(mockData.post);
             const result = await postService.findOnePost(postId);
             expect(result).toEqual(mockData.post);
+        });
+    });
+
+    describe('updatePost', () => {
+        const postId = 1;
+        const UserId = 1;
+        const body = { title: '제목', content: '게시글 내용', category: 1 };
+        it('repo의 findOnePost를 호출하는지 확인', async () => {
+            jest.spyOn(postRepository, 'findOnePost').mockResolvedValue(mockData.post);
+            await postService.updatePost(postId, UserId, body);
+            expect(postRepository.findOnePost).toHaveBeenCalledWith(postId);
+        });
+
+        it('존재하지 않는 postId일 경우', async () => {
+            jest.spyOn(postRepository, 'findOnePost').mockResolvedValue(null);
+            await expect(postService.updatePost(postId, UserId, body)).rejects.toThrowError(
+                new BadRequestException('존재하지 않는 게시글 입니다'),
+            );
+        });
+
+        it('repo의 updatePost를 호출하는지 확인', async () => {
+            jest.spyOn(postRepository, 'updatePost').mockResolvedValue(null);
+            jest.spyOn(postRepository, 'findOnePost').mockResolvedValue(mockData.post);
+            await postService.updatePost(UserId, postId, body);
+            expect(postRepository.updatePost).toHaveBeenCalledWith(
+                postId,
+                UserId,
+                body.title,
+                body.content,
+                body.category,
+            );
+        });
+
+        it('리턴값이 null인지 확인', async () => {
+            jest.spyOn(postRepository, 'updatePost').mockResolvedValue(null);
+            jest.spyOn(postRepository, 'findOnePost').mockResolvedValue(mockData.post);
+            const result = await postService.updatePost(UserId, postId, body);
+            expect(result).toEqual(undefined);
         });
     });
 });

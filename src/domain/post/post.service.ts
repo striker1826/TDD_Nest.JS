@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PostRepository } from './post.repository';
 
 @Injectable()
@@ -17,5 +17,13 @@ export class PostService {
 
     async findOnePost(postId: number) {
         return await this.postRepository.findOnePost(postId);
+    }
+
+    async updatePost(postId: number, UserId: number, body): Promise<void> {
+        const { title, content, category } = body;
+        const post = await this.postRepository.findOnePost(postId);
+        if (!post) throw new BadRequestException('존재하지 않는 게시글 입니다');
+        await this.postRepository.updatePost(UserId, postId, title, content, category);
+        return;
     }
 }
