@@ -1,27 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../../src/app.module';
-import { AuthService } from '../../src/domain/auth/auth.service';
-import { AuthRepository } from '../../src/domain/auth/auth.repository';
-import { Connection, createConnection, getConnectionOptions, Repository } from 'typeorm';
-import { User } from '../../src/entities/user.entity';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { Post } from '../../src/entities/post.entity';
-import { Comment } from '../../src/entities/comment.entity';
-import { PostLike } from '../../src/entities/post-like.entity';
+import { User } from '../src/entities/user.entity';
+import { Post } from '../src/entities/post.entity';
+import { Comment } from '../src/entities/comment.entity';
+import { PostLike } from '../src/entities/post-like.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from '../../src/domain/auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from '../src/domain/auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { PostModule } from '../src/domain/post/post.module';
+import * as jwt from 'jsonwebtoken';
+import { JwtStrategy } from '../src/domain/auth/passport/jwt.passport';
+
+const member = { id: 1, email: 'test@email.com', password: '1234' };
 
 describe('AppController (e2e)', () => {
     let app: INestApplication;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [
                 ConfigModule.forRoot(),
                 AuthModule,
+                PostModule,
                 TypeOrmModule.forRoot({
                     type: 'mysql',
                     host: process.env.DB_HOST,
@@ -30,6 +31,8 @@ describe('AppController (e2e)', () => {
                     password: process.env.DB_PASSWORD,
                     database: process.env.DB_MOCK_DATABASE,
                     entities: [User, Post, Comment, PostLike],
+                    synchronize: true,
+                    dropSchema: true,
                 }),
                 // TypeOrmModule.forRoot({
                 //     type: 'sqlite',
@@ -39,11 +42,16 @@ describe('AppController (e2e)', () => {
                 //     dropSchema: true,
                 // }),
             ],
+            providers: [JwtStrategy],
         }).compile();
 
         app = moduleFixture.createNestApplication();
         await app.init();
     });
+
+    // afterAll(async () => {
+    //     await app.close();
+    // });
 
     it('/auth/signup (POST)', () => {
         return request(app.getHttpServer())
@@ -57,5 +65,18 @@ describe('AppController (e2e)', () => {
             .post('/auth/login')
             .send({ email: 'test@email.com', password: '1234' })
             .expect(201);
+    });
+
+    it('/post (POST)', () => {
+        const accessToken = jwt.sign({ UserId: member.id }, 'accessKey', { expiresIn: '1800s' });
+        return request(app.getHttpServer())
+            .post('/post')
+            .send({ title: '제목', content: '내용', category: 1 })
+            .set('Authorization', `Bearer ${accessToken}`)
+            .expect(201);
+    });
+
+    it('/post (GET)', () => {
+        return request(app.getHttpServer()).get('/post').expect(200);
     });
 });
