@@ -1,8 +1,11 @@
 import { BadRequestException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Comment } from '../../entities/comment.entity';
+import { PostLike } from '../../entities/post-like.entity';
+import { Post } from '../../entities/post.entity';
 import { User } from '../../entities/user.entity';
-import { DatabaseModule } from '../database/database.module';
 import { AuthRepository } from './auth.repository';
 import { AuthService } from './auth.service';
 
@@ -21,8 +24,16 @@ describe('AuthService', () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            imports: [DatabaseModule, TypeOrmModule.forFeature([User])],
-            providers: [AuthService, AuthRepository],
+            imports: [
+                TypeOrmModule.forFeature([User]),
+                TypeOrmModule.forRoot({
+                    type: 'sqlite',
+                    database: ':memory:',
+                    entities: [User, Post, Comment, PostLike],
+                    synchronize: true,
+                }),
+            ],
+            providers: [AuthService, AuthRepository, JwtService],
         }).compile();
 
         authService = module.get<AuthService>(AuthService);

@@ -26,8 +26,8 @@ export class AuthService {
         if (!user) throw new BadRequestException('계정이 올바르지 않습니다');
         const isCompareByPassword = await bcrypt.compare(password, user.password);
         if (!isCompareByPassword) throw new BadRequestException('계정이 올바르지 않습니다');
-        const access_token = this.jwtGenerate(user, 'accessToken');
-        const refresh_token = this.jwtGenerate(user, 'refreshToken');
+        const access_token = await this.jwtGenerate(user, 'accessToken');
+        const refresh_token = await this.jwtGenerate(user, 'refreshToken');
         return { access_token, refresh_token };
     }
 

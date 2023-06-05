@@ -10,4 +10,10 @@ export class AuthController {
         await this.authService.createUser(body);
         return;
     }
+
+    @Post('login')
+    async login(@Body() body) {
+        const result = await this.authService.login(body);
+        return result;
+    }
 }

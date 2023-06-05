@@ -23,12 +23,21 @@ describe('AppController (e2e)', () => {
                 ConfigModule.forRoot(),
                 AuthModule,
                 TypeOrmModule.forRoot({
-                    type: 'sqlite',
-                    database: ':memory:',
+                    type: 'mysql',
+                    host: process.env.DB_HOST,
+                    port: 3306,
+                    username: process.env.DB_USERNAME,
+                    password: process.env.DB_PASSWORD,
+                    database: process.env.DB_MOCK_DATABASE,
                     entities: [User, Post, Comment, PostLike],
-                    synchronize: true,
-                    dropSchema: true,
                 }),
+                // TypeOrmModule.forRoot({
+                //     type: 'sqlite',
+                //     database: ':memory:',
+                //     entities: [User, Post, Comment, PostLike],
+                //     synchronize: true,
+                //     dropSchema: true,
+                // }),
             ],
         }).compile();
 
