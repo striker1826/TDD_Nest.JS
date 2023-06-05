@@ -7,12 +7,14 @@ import { PostLike } from '../../entities/post-like.entity';
 import { Comment } from '../../entities/comment.entity';
 import { PostRepository } from './post.repository';
 
-const posts = [
-    { id: 1, UserId: 1, title: '제목', content: '내용', createdAt: '2023-06-05T05:39:28.388Z' },
-    { id: 2, UserId: 2, title: '제목2', content: '내용2', createdAt: '2023-06-05T05:39:28.388Z' },
-    { id: 3, UserId: 3, title: '제목3', content: '내용3', createdAt: '2023-06-05T05:39:28.388Z' },
-];
-
+const mockData = {
+    posts: [
+        { id: 1, UserId: 1, title: '제목', content: '내용', createdAt: '2023-06-05T05:39:28.388Z' },
+        { id: 2, UserId: 2, title: '제목2', content: '내용2', createdAt: '2023-06-05T05:39:28.388Z' },
+        { id: 3, UserId: 3, title: '제목3', content: '내용3', createdAt: '2023-06-05T05:39:28.388Z' },
+    ],
+    post: { id: 1, UserId: 1, title: '제목', content: '내용', createdAt: '2023-06-05T05:39:28.388Z' },
+};
 describe('PostService', () => {
     let postService: PostService;
     let postRepository: PostRepository;
@@ -56,15 +58,30 @@ describe('PostService', () => {
 
     describe('findAllPosts', () => {
         it('repo의 findAllPosts를 호출하는지 확인', async () => {
-            jest.spyOn(postRepository, 'findAllPosts').mockResolvedValue(posts);
+            jest.spyOn(postRepository, 'findAllPosts').mockResolvedValue(mockData.posts);
             await postService.findAllPosts();
             expect(postRepository.findAllPosts).toHaveBeenCalled();
         });
 
         it('repo의 결과물인 post 배열을 리턴하는지 확인', async () => {
-            jest.spyOn(postRepository, 'findAllPosts').mockResolvedValue(posts);
+            jest.spyOn(postRepository, 'findAllPosts').mockResolvedValue(mockData.posts);
             const result = await postService.findAllPosts();
-            expect(result).toEqual(posts);
+            expect(result).toEqual(mockData.posts);
+        });
+    });
+
+    describe('findOnePost', () => {
+        const postId = 1;
+        it('repo의 findOnePost를 호출하는지 확인', async () => {
+            jest.spyOn(postRepository, 'findOnePost').mockResolvedValue(mockData.post);
+            await postService.findOnePost(postId);
+            expect(postRepository.findOnePost).toHaveBeenCalledWith(postId);
+        });
+
+        it('repo의 결과물을 리턴하는지 확인', async () => {
+            jest.spyOn(postRepository, 'findOnePost').mockResolvedValue(mockData.post);
+            const result = await postService.findOnePost(postId);
+            expect(result).toEqual(mockData.post);
         });
     });
 });

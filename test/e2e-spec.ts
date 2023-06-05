@@ -79,4 +79,8 @@ describe('AppController (e2e)', () => {
     it('/post (GET)', () => {
         return request(app.getHttpServer()).get('/post').expect(200);
     });
+
+    it('/post:postId (GET)', () => {
+        return request(app.getHttpServer()).get('/post/1').expect(200);
+    });
 });

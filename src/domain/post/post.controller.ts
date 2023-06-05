@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { HttpUser } from '../../common/decorators/http_user.decorator';
 import { PostService } from './post.service';
@@ -17,5 +17,10 @@ export class PostController {
     @Get()
     async getAllPosts() {
         return await this.postService.findAllPosts();
+    }
+
+    @Get('/:postId')
+    async getOnePost(@Param('postId') postId: number) {
+        return await this.postService.findOnePost(postId);
     }
 }
