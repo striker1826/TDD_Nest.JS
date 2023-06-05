@@ -23,4 +23,9 @@ export class PostRepository {
         const result = await this.postModel.find();
         return plainToInstance(PostsOutputDto, result);
     }
+
+    async findOnePost(postId: number): Promise<PostsOutputDto> {
+        const result = await this.postModel.findOne({ where: { id: postId } });
+        return plainToInstance(PostsOutputDto, result);
+    }
 }

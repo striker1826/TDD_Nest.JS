@@ -14,4 +14,8 @@ export class PostService {
     async findAllPosts() {
         return await this.postRepository.findAllPosts();
     }
+
+    async findOnePost(postId: number) {
+        return await this.postRepository.findOnePost(postId);
+    }
 }

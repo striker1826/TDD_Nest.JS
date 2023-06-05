@@ -8,11 +8,14 @@ import { PostController } from './post.controller';
 import { PostRepository } from './post.repository';
 import { PostService } from './post.service';
 
-const posts = [
-    { id: 1, UserId: 1, title: '제목', content: '내용', createdAt: '2023-06-05T05:39:28.388Z' },
-    { id: 2, UserId: 2, title: '제목2', content: '내용2', createdAt: '2023-06-05T05:39:28.388Z' },
-    { id: 3, UserId: 3, title: '제목3', content: '내용3', createdAt: '2023-06-05T05:39:28.388Z' },
-];
+const mockData = {
+    posts: [
+        { id: 1, UserId: 1, title: '제목', content: '내용', createdAt: '2023-06-05T05:39:28.388Z' },
+        { id: 2, UserId: 2, title: '제목2', content: '내용2', createdAt: '2023-06-05T05:39:28.388Z' },
+        { id: 3, UserId: 3, title: '제목3', content: '내용3', createdAt: '2023-06-05T05:39:28.388Z' },
+    ],
+    post: { id: 1, UserId: 1, title: '제목', content: '내용', createdAt: '2023-06-05T05:39:28.388Z' },
+};
 
 describe('PostController', () => {
     let postController: PostController;
@@ -59,15 +62,30 @@ describe('PostController', () => {
 
     describe('getAllPosts', () => {
         it('postService의 findAllPosts를 호출하는지 확인', async () => {
-            jest.spyOn(postService, 'findAllPosts').mockResolvedValue(posts);
+            jest.spyOn(postService, 'findAllPosts').mockResolvedValue(mockData.posts);
             await postController.getAllPosts();
             expect(postService.findAllPosts).toHaveBeenCalledTimes(1);
         });
 
         it('리턴값이 postService에서 넘겨준 값인지 확인', async () => {
-            jest.spyOn(postService, 'findAllPosts').mockResolvedValue(posts);
+            jest.spyOn(postService, 'findAllPosts').mockResolvedValue(mockData.posts);
             const result = await postController.getAllPosts();
-            expect(result).toEqual(posts);
+            expect(result).toEqual(mockData.posts);
+        });
+    });
+
+    describe('getOnePost', () => {
+        let postId = 1;
+        it('postService의 findOnePost를 호출하는지 확인', async () => {
+            jest.spyOn(postService, 'findOnePost').mockResolvedValue(mockData.post);
+            await postController.getOnePost(postId);
+            expect(postService.findOnePost).toHaveBeenCalledWith(postId);
+        });
+
+        it('리턴값이 postService에서 넘겨준 값인지 확인', async () => {
+            jest.spyOn(postService, 'findOnePost').mockResolvedValue(mockData.post);
+            const result = await postController.getOnePost(postId);
+            expect(result).toEqual(mockData.post);
         });
     });
 });
