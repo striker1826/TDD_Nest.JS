@@ -28,4 +28,9 @@ export class PostRepository {
         const result = await this.postModel.findOne({ where: { id: postId } });
         return plainToInstance(PostsOutputDto, result);
     }
+
+    async updatePost(UserId: number, postId: number, title: string, content: string, category: number): Promise<void> {
+        await this.postModel.update({ id: postId, userId: UserId }, { title, content, category });
+        return;
+    }
 }
