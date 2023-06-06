@@ -100,4 +100,21 @@ describe('PostController', () => {
             expect(postService.updatePost).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe('deletePost', () => {
+        let postId = 1;
+        let UserId = 1;
+
+        it('postService의 updatePost를 호출하는지 확인', async () => {
+            jest.spyOn(postService, 'deletePost').mockResolvedValue(null);
+            await postController.deletePost(postId, UserId);
+            expect(postService.deletePost).toHaveBeenCalledTimes(1);
+        });
+
+        it('리턴값이 null인지 확인', async () => {
+            jest.spyOn(postService, 'deletePost').mockResolvedValue(null);
+            const result = await postController.deletePost(postId, UserId);
+            expect(result).toEqual(undefined);
+        });
+    });
 });

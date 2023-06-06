@@ -33,4 +33,8 @@ export class PostRepository {
         await this.postModel.update({ id: postId, userId: UserId }, { title, content, category });
         return;
     }
+
+    async deletePost(postId: number, UserId: number) {
+        await this.postModel.delete({ id: postId, userId: UserId });
+    }
 }
