@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PostModule } from '../src/domain/post/post.module';
 import * as jwt from 'jsonwebtoken';
 import { JwtStrategy } from '../src/domain/auth/passport/jwt.passport';
+import { CommentModule } from '../src/domain/comment/comment.module';
 
 let accessToken;
 const member = { id: 1, email: 'test@email.com', password: '1234' };
@@ -24,6 +25,7 @@ describe('AppController (e2e)', () => {
                 ConfigModule.forRoot(),
                 AuthModule,
                 PostModule,
+                CommentModule,
                 TypeOrmModule.forRoot({
                     type: 'mysql',
                     host: process.env.DB_HOST,
@@ -35,13 +37,6 @@ describe('AppController (e2e)', () => {
                     synchronize: true,
                     dropSchema: true,
                 }),
-                // TypeOrmModule.forRoot({
-                //     type: 'sqlite',
-                //     database: ':memory:',
-                //     entities: [User, Post, Comment, PostLike],
-                //     synchronize: true,
-                //     dropSchema: true,
-                // }),
             ],
             providers: [JwtStrategy],
         }).compile();
@@ -50,15 +45,15 @@ describe('AppController (e2e)', () => {
         await app.init();
     });
 
-    describe('auth', () => {
-        it('/signup (POST)', () => {
+    describe('회원가입 후 로그인', () => {
+        it('/auth/signup (POST)', () => {
             return request(app.getHttpServer())
                 .post('/auth/signup')
                 .send({ email: 'test@email.com', password: '1234', nickname: 'testUser' })
                 .expect(201);
         });
 
-        it('/login (POST)', () => {
+        it('/auth/login (POST)', () => {
             return request(app.getHttpServer())
                 .post('/auth/login')
                 .send({ email: 'test@email.com', password: '1234' })
@@ -66,8 +61,8 @@ describe('AppController (e2e)', () => {
         });
     });
 
-    describe('post', () => {
-        it('/ (POST)', () => {
+    describe('게시글 작성 -> 조회 -> 상세 조회 -> 댓글 작성 -> 게시글 변경 -> 댓글 변경 -> 댓글 삭제 -> 게시글 삭제', () => {
+        it('게시글 작성 /post (POST)', () => {
             return request(app.getHttpServer())
                 .post('/post')
                 .send({ title: '제목', content: '내용', category: 1 })
@@ -75,15 +70,23 @@ describe('AppController (e2e)', () => {
                 .expect(201);
         });
 
-        it('/ (GET)', () => {
+        it('게시글 조회 /post (GET)', () => {
             return request(app.getHttpServer()).get('/post').expect(200);
         });
 
-        it('/:postId (GET)', () => {
+        it('게시글 상세 조회 /post/:postId (GET)', () => {
             return request(app.getHttpServer()).get('/post/1').expect(200);
         });
 
-        it('/:postId (PUT)', () => {
+        it('댓글 작성 /comment/:postId (POST)', () => {
+            return request(app.getHttpServer())
+                .post('/comment/1')
+                .send({ content: '댓글' })
+                .set('Authorization', `Bearer ${accessToken}`)
+                .expect(201);
+        });
+
+        it('게시글 변경 /post/:postId (PUT)', () => {
             return request(app.getHttpServer())
                 .put('/post/1')
                 .send({ title: '제목', content: '수정된 내용', category: 1 })
@@ -91,21 +94,26 @@ describe('AppController (e2e)', () => {
                 .expect(200);
         });
 
-        it('/:postId (DELETE', () => {
+        it('댓글 변경 /comment/:commentId (PUT)', async () => {
+            return await request(app.getHttpServer())
+                .put('/comment/1')
+                .send({ content: '수정된 댓글' })
+                .set('Authorization', `Bearer ${accessToken}`)
+                .expect(200);
+        });
+
+        it('댓글 삭제 /comment/:commentId (DELETE)', async () => {
+            return request(app.getHttpServer())
+                .delete('/comment/1')
+                .set('Authorization', `Bearer ${accessToken}`)
+                .expect(200);
+        });
+
+        it('게시글 삭제 /post/:postId (DELETE', () => {
             return request(app.getHttpServer())
                 .delete('/post/1')
                 .set('Authorization', `Bearer ${accessToken}`)
                 .expect(200);
-        });
-    });
-
-    describe('comment', () => {
-        it('/:postId (POST)', () => {
-            return request(app.getHttpServer())
-                .post('/comment/1')
-                .send({ comment: '댓글' })
-                .set('Authorization', `Bearer ${accessToken}`)
-                .expect(201);
         });
     });
 });
