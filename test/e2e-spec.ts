@@ -61,7 +61,7 @@ describe('AppController (e2e)', () => {
         });
     });
 
-    describe('게시글 작성 -> 조회 -> 상세 조회 -> 댓글 작성 -> 게시글 변경 -> 댓글 변경 -> 댓글 삭제 -> 게시글 삭제', () => {
+    describe('게시글 작성 -> 게시글 조회 -> 게시글 상세 조회 -> 댓글 작성 -> 댓글 조회 -> 게시글 변경 -> 댓글 변경 -> 댓글 삭제 -> 게시글 삭제', () => {
         it('게시글 작성 /post (POST)', () => {
             return request(app.getHttpServer())
                 .post('/post')
@@ -84,6 +84,10 @@ describe('AppController (e2e)', () => {
                 .send({ content: '댓글' })
                 .set('Authorization', `Bearer ${accessToken}`)
                 .expect(201);
+        });
+
+        it('댓글 조회 /comment/:postId (GET)', () => {
+            return request(app.getHttpServer()).get('/comment/1').expect(200);
         });
 
         it('게시글 변경 /post/:postId (PUT)', () => {

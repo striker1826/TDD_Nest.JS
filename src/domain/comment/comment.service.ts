@@ -14,11 +14,24 @@ export class CommentService {
         return;
     }
 
+    async findCommentsByPostId(postId: number) {
+        const post = await this.postRepository.findOnePost(postId);
+        if (!post) throw new BadRequestException('존재하지 않는 게시글 입니다');
+        return await this.commentRepository.findCommentsByPostId(postId);
+    }
+
     async updateComment(commentId, UserId, body): Promise<void> {
         const { content } = body;
         const comment = await this.commentRepository.findOneComment(commentId);
         if (!comment) throw new BadRequestException('존재하는 댓글이 아닙니다');
         await this.commentRepository.updateComment(commentId, UserId, content);
+        return;
+    }
+
+    async deleteComment(commentId: number, UserId: number): Promise<void> {
+        const comment = await this.commentRepository.findOneComment(commentId);
+        if (!comment) throw new BadRequestException('존재하는 댓글이 아닙니다');
+        await this.commentRepository.deleteComment(commentId, UserId);
         return;
     }
 }
