@@ -123,4 +123,21 @@ describe('PostService', () => {
             expect(result).toEqual(undefined);
         });
     });
+
+    describe('deletePost', () => {
+        const postId = 1;
+        const UserId = 1;
+
+        it('repo의 deletePost를 호출하는지 확인', async () => {
+            jest.spyOn(postRepository, 'deletePost').mockResolvedValue(null);
+            await postService.deletePost(postId, UserId);
+            expect(postRepository.deletePost).toHaveBeenCalledWith(postId, UserId);
+        });
+
+        it('리턴값이 null인지 확인', async () => {
+            jest.spyOn(postRepository, 'deletePost').mockResolvedValue(null);
+            const result = await postService.deletePost(postId, UserId);
+            expect(result).toEqual(undefined);
+        });
+    });
 });

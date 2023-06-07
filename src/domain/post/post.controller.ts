@@ -31,4 +31,12 @@ export class PostController {
         await this.postService.updatePost(postId, UserId, body);
         return;
     }
+
+    @Delete('/:postId')
+    @UseGuards(AuthGuard('jwt'))
+    async deletePost(@Param('postId') postId: number, @HttpUser() httpUser): Promise<void> {
+        const UserId = httpUser.UserId;
+        await this.postService.deletePost(postId, UserId);
+        return;
+    }
 }
