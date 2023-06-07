@@ -16,7 +16,9 @@ export class PostService {
     }
 
     async findOnePost(postId: number) {
-        return await this.postRepository.findOnePost(postId);
+        const post = await this.postRepository.findOnePost(postId);
+        if (!post) throw new BadRequestException('존재하지 않는 게시글 입니다');
+        return post;
     }
 
     async updatePost(postId: number, UserId: number, body): Promise<void> {
