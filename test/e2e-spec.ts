@@ -91,11 +91,21 @@ describe('AppController (e2e)', () => {
                 .expect(200);
         });
 
-        it('/post/:postId (DELETE', () => {
+        it('/:postId (DELETE', () => {
             return request(app.getHttpServer())
                 .delete('/post/1')
                 .set('Authorization', `Bearer ${accessToken}`)
                 .expect(200);
+        });
+    });
+
+    describe('comment', () => {
+        it('/:postId (POST)', () => {
+            return request(app.getHttpServer())
+                .post('/comment/1')
+                .send({ comment: '댓글' })
+                .set('Authorization', `Bearer ${accessToken}`)
+                .expect(201);
         });
     });
 });
