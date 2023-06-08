@@ -73,6 +73,12 @@ describe('PostService', () => {
 
     describe('findOnePost', () => {
         const postId = 1;
+
+        it('존재하지 않는 게시글이면 에러 리턴', async () => {
+            jest.spyOn(postRepository, 'findOnePost').mockResolvedValue(null);
+            await expect(postService.findOnePost(postId)).rejects.toThrowError('존재하지 않는 게시글 입니다');
+        });
+
         it('repo의 findOnePost를 호출하는지 확인', async () => {
             jest.spyOn(postRepository, 'findOnePost').mockResolvedValue(mockData.post);
             await postService.findOnePost(postId);

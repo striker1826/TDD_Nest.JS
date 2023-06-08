@@ -52,12 +52,7 @@ describe('AuthService', () => {
         });
 
         it('존재하는 이메일이면 "이미 존재하는 이메일 입니다" 에러 메세지 리턴', async () => {
-            jest.spyOn(authRepository, 'findUserByEmail').mockResolvedValue({
-                id: 1,
-                email: 'test@email.com',
-                password: '1234',
-                nickname: 'testUser',
-            });
+            jest.spyOn(authRepository, 'findUserByEmail').mockResolvedValue(mockData.user);
             await expect(authService.createUser(body)).rejects.toThrowError(
                 new BadRequestException('이미 존재하는 이메일 입니다'),
             );
@@ -101,9 +96,16 @@ describe('AuthService', () => {
 
         it('토큰을 리턴하는지 확인', async () => {
             jest.spyOn(authRepository, 'findUserByEmail').mockResolvedValue(mockData.user);
-            jest.spyOn(authService, 'jwtGenerate').mockResolvedValue('accessToken');
             const result = await authService.login(body);
-            expect(result).toEqual({ access_token: 'accessToken', refresh_token: 'accessToken' });
+            expect(result).toHaveProperty('access_token');
+            expect(result).toHaveProperty('refresh_token');
+        });
+    });
+
+    describe('jwtGenerate', () => {
+        it('string token 리턴하는지 확인', async () => {
+            const result = await authService.jwtGenerate(mockData.user, 'accessToken');
+            expect(typeof result).toEqual('string');
         });
     });
 });
