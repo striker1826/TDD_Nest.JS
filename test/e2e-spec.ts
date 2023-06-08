@@ -155,6 +155,12 @@ describe('AppController (e2e)', () => {
         });
     });
 
+    it('게시글 조회 /post (GET)', async () => {
+        const result = await request(app.getHttpServer()).get('/post');
+        expect(result.status).toBe(200);
+        expect(Array.isArray(result.body)).toEqual(true);
+    });
+
     describe('case 4: 회원가입 -> 로그인 -> 게시글 조회 -> 게시글 작성 -> 게시글 조회 -> 게시글 상세 조회 -> 댓글 조회 -> 댓글 작성 -> 댓글 변경 -> 댓글 삭제 -> 게시글 삭제', () => {
         let postId: number;
 
